@@ -1,0 +1,4 @@
+application:
+    env: "prod"
+settings:
+    hotterSysConfig: true

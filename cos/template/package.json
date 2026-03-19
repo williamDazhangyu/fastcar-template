@@ -1,0 +1,54 @@
+{
+	"name": "@fastcar/template-cos",
+	"version": "1.0.0",
+	"description": "对象存储服务模板",
+	"engines": {
+		"node": ">=22"
+	},
+	"scripts": {
+		"start": "pm2 start ecosystem.config.yml",
+		"stop": "pm2 stop ecosystem.config.yml",
+		"delete": "pm2 delete ecosystem.config.yml",
+		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+		"debug": "node -r ts-node/register ./src/app.ts",
+		"pkg": "npm run build && node build.js"
+	},
+	"dependencies": {
+		"@fastcar/core": "^0.3.19",
+		"@fastcar/koa": "^0.1.21",
+		"@fastcar/server": "^0.0.5",
+		"@fastcar/timer": "^0.2.0",
+		"@types/mime-db": "^1.43.5",
+		"@types/tz-offset": "^0.0.3",
+		"compressing": "^1.10.1",
+		"crc": "^4.3.2",
+		"koa-body": "^6.0.1",
+		"koa2-cors": "^2.0.6",
+		"mime-db": "^1.53.0",
+		"minimatch": "^10.1.1",
+		"nanoid": "3.3.4",
+		"tz-offset": "^0.0.2"
+	},
+	"devDependencies": {
+		"@types/axios": "^0.14.0",
+		"@types/koa-bodyparser": "4.3.3",
+		"@types/minimatch": "^6.0.0",
+		"@types/mocha": "^9.1.0",
+		"@types/node": "^22.10.2",
+		"axios": "^1.7.9",
+		"mocha": "^9.1.4",
+		"tar": "^7.5.2",
+		"ts-node": "^10.9.2",
+		"tsc-alias": "^1.8.16",
+		"tsconfig-paths": "^4.2.0",
+		"typescript": "^5.9.3"
+	},
+	"peerDependencies": {
+		"pm2": "^6.0.14"
+	},
+	"peerDependenciesMeta": {
+		"pm2": {
+			"optional": true
+		}
+	}
+}

@@ -1,0 +1,56 @@
+#应用的基础配置
+settings:
+    hotterSysConfig: true #监听系统配置
+    microservices:
+        center: #应用类型
+            token: "nW0tT4bZ6qM7mF7wD2rT2pR9dT7gK3hZ"
+            servers:
+                - host: "localhost"
+                  clusters: 1 #代表有两个这样的 serviceId和prot端口号都递增
+                  list:
+                      - type: "ws"
+                        server: { port: 60000 }
+                        timeout: 0 #设置永不超时
+                        connectionLimit: 1
+                        disconnectInterval: 1000 #断线重连1秒
+                        retry: { retryCount: 3, retryInterval: 3000, timeout: 30000, maxMsgNum: 10000, increase: true }
+                - host: "localhost"
+                  clusters: 3 #代表有两个这样的 serviceId和prot端口号都递增
+                  list:
+                      - type: "ws"
+                        server: { port: 60000 }
+                        timeout: 0 #设置永不超时
+                        connectionLimit: 1
+                        disconnectInterval: 1000 #断线重连1秒
+                        retry: { retryCount: 3, retryInterval: 3000, timeout: 30000, maxMsgNum: 10000, increase: true }
+        connector:
+            token: "x3TGsWC9uloZu235LA07eAiJ61nQ1A5f"
+            servers:
+                - host: "localhost"
+                  clusters: 1
+                  list:
+                      - front: true
+                        type: "ws"
+                        server: { port: 60100 }
+        chat:
+            token: "go0kbkNM3wQ4e2Vgo0kbkNM3wQ4e2V"
+            servers:
+                - host: "localhost"
+                  clusters: 1
+                  list:
+                      - type: "ws"
+                        server: { port: 60200 }
+        web:
+            token: "go0kbkNM3wQ4e2Vgo0kbkNM3wQ4e2V"
+            koa:
+                koaBodyParser: #koabody设置 新增xml解析
+                    enableTypes: ["json", "form", "text"]
+                    extendTypes: { text: ["text/xml", "application/xml"] }
+            servers:
+                - host: "localhost"
+                  clusters: 1
+                  list:
+                      - type: "http"
+                        server: { port: 8080 } #服务器配置 支持 http http2和https
+                      - type: "ws"
+                        server: { port: 60300 }

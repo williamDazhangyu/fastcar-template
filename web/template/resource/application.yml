@@ -1,0 +1,10 @@
+application:
+    env: "dev"
+settings:
+    koa:
+        server: { port: 1234 } #服务器配置 支持 http http2和https
+        koaStatic: #静态资源访问
+            { "public": "public" } #前者为别名后者为相对于资源路径或者绝对路径
+        koaBodyParser: #koabody设置 新增xml解析
+            enableTypes: ["json", "form", "text"]
+            extendTypes: { text: ["text/xml", "application/xml"] }

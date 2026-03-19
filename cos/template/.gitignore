@@ -1,0 +1,10 @@
+node_modules/*
+yarn.lock
+package-lock.json
+**/*.map
+**/*.out
+logs/*
+*.log
+target/*
+*.tgz
+data/*

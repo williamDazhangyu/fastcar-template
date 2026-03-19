@@ -1,0 +1,20 @@
+settings:
+    koa:
+        server:
+            - { port: 80, hostname: "0.0.0.0" }
+            - { port: 443, hostname: "0.0.0.0", protocol: https, ssl: { key: "./ssl/server.key", cert: "./ssl/server.crt" } }
+        koaBodyOptions:
+            multipart: true
+            formidable:
+                maxFileSize: 10737418240, #设置上传文件大小最大限制，默认1G
+        extra:
+            cors: #跨域支持示范
+                origin: "*"
+                maxAge: 60000 #指定本次预检请求的有效期，单位为秒。
+                credentials: true #是否允许发送Cookie
+                allowMethods: [OPTIONS, GET, PUT, POST, DELETE] #设置所允许的HTTP请求方法
+                allowHeaders: ["Content-Type", "Authorization", "Accept"] #设置服务器支持的所有头信息字段
+    # limit: { count: 1, frequency: 10 } #每秒十次 限制请求频率
+    printConsole: true
+    domain: "https://www.example.com" #对外展示的域名
+    dir_path: "/www" #数据存放的文件夹

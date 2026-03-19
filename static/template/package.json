@@ -1,0 +1,40 @@
+{
+	"name": "fastcar-static",
+	"version": "1.0.0",
+	"description": "静态资源服务器模板",
+	"engines": {
+		"node": ">=16"
+	},
+	"scripts": {
+		"start": "pm2 start ecosystem.config.yml",
+		"stop": "pm2 stop ecosystem.config.yml",
+		"delete": "pm2 delete ecosystem.config.yml",
+		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+		"debug": "node -r ts-node/register ./src/app.ts"
+	},
+	"dependencies": {
+		"@fastcar/core": "^0.3.19",
+		"@fastcar/koa": "^0.1.21",
+		"@fastcar/server": "^0.0.5",
+		"koa": "^3.1.2",
+		"koa-mount": "^4.2.0",
+		"koa-range": "^0.3.0",
+		"koa-static": "^5.0.0"
+	},
+	"devDependencies": {
+		"@types/koa": "^3.0.1",
+		"@types/node": "^22.10.1",
+		"ts-node": "^10.9.2",
+		"tsc-alias": "^1.8.16",
+		"tsconfig-paths": "^4.2.0",
+		"typescript": "^5.9.3"
+	},
+	"peerDependencies": {
+		"pm2": "^6.0.14"
+	},
+	"peerDependenciesMeta": {
+		"pm2": {
+			"optional": true
+		}
+	}
+}

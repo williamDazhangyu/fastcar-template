@@ -1,0 +1,10 @@
+# 编排容器服务 使用 pm2 进行运行
+apps:
+  - name: "fastcar-static"
+    script: "./target/app.js"
+    watch: false
+    max_memory_restart: 314572800
+    wait_ready: true
+    kill_timeout: 5000
+    env:
+      TZ: "Asia/Shanghai"

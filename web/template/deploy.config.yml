@@ -1,0 +1,23 @@
+# 远程部署服务 (前提是安装了pm2运行)
+deploy: {
+        #初始化 sudo pm2 deploy deploy.config.yml production setup
+        #部署运行 sudo pm2 deploy deploy.config.yml production
+        #回退到上一个版本 sudo pm2 deploy deploy.config.yml production revert 1
+        #执行一次性命令 sudo pm2 deploy deploy.config.yml production exec "pm2 list"
+        #执行细节
+        #"pre-setup" : "echo 'commands or local script path to be run on the host before the setup process starts'",
+        # "post-setup": "echo 'commands or a script path to be run on the host after cloning the repo'",
+        # "pre-deploy" : "pm2 startOrRestart ecosystem.json --env production",
+        # "post-deploy" : "pm2 startOrRestart ecosystem.json --env production",
+        # "pre-deploy-local" : "echo 'This is a local executed command'"
+
+        production: {
+                key: "/path/to/some.pem", #ssh密钥 非必填
+                user: "root", #和key配合使用
+                host: "127.0.0.1", #远程服务器ip
+                ref: "origin/master", #git分支
+                repo: "git@github.com:repo.git", #项目git地址
+                path: "/root/app/fastcar-templete-web", #远程项目地址
+                post-deploy: "git pull; npm run start", #启动服务
+            },
+    }

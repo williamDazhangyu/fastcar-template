@@ -1,0 +1,38 @@
+{
+	"name": "template-rpc",
+	"version": "1.0.0",
+	"description": "RPC 服务器模板",
+	"engines": {
+		"node": ">=22"
+	},
+	"scripts": {
+		"start": "pm2 start ecosystem.config.yml",
+		"stop": "pm2 stop ecosystem.config.yml",
+		"delete": "pm2 delete ecosystem.config.yml",
+		"build": "tsc --project tsconfig.json",
+		"debug": "node -r ts-node/register ./src/app.ts"
+	},
+	"dependencies": {
+		"@fastcar/core": "^0.3.19",
+		"@fastcar/rpc": "^0.2.9",
+		"@fastcar/server": "^0.0.5",
+		"@fastcar/timer": "^0.2.0",
+		"nanoid": "^3.3.4",
+		"protobufjs": "^7.1.2"
+	},
+	"devDependencies": {
+		"@types/mocha": "^10.0.10",
+		"@types/node": "^22.10.1",
+		"mocha": "^9.1.4",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.9.3"
+	},
+	"peerDependencies": {
+		"pm2": "^6.0.14"
+	},
+	"peerDependenciesMeta": {
+		"pm2": {
+			"optional": true
+		}
+	}
+}

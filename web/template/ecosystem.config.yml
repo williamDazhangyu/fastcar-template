@@ -1,0 +1,15 @@
+#编排容器服务 使用pm2进行运行
+apps:
+    - name: "@fastcar/template-web"
+      script: "./target/app.js"
+      watch: false
+      # error_file: "/dev/null" # 禁用日志  "/dev/null"
+      # out_file: "/dev/null" #禁用日志   "/dev/null"
+      max_memory_restart: 314572800
+      wait_ready: true #就绪等待
+      # listen_timeout: 5000
+      kill_timeout: 5000 #超时等待
+      # instances: 4 #或者是max  #是否用集群模式启动
+      # exec_mode: "cluster"
+      env:
+          TZ: "Asia/Shanghai"

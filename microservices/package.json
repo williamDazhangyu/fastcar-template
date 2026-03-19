@@ -1,0 +1,35 @@
+{
+	"name": "@fastcar/template-microservices",
+	"version": "1.0.0",
+	"description": "基于 fastcar-core 的微服务应用模板",
+	"main": "index.js",
+	"keywords": [
+		"fastcar",
+		"microservices",
+		"template",
+		"typescript",
+		"nodejs"
+	],
+	"author": "william_zhong",
+	"license": "MIT",
+	"homepage": "https://github.com/williamDazhangyu/fastcar-template#readme",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/williamDazhangyu/fastcar-template.git",
+		"directory": "microservices"
+	},
+	"bugs": {
+		"url": "https://github.com/williamDazhangyu/fastcar-template/issues"
+	},
+	"engines": {
+		"node": ">=16"
+	},
+	"files": [
+		"template",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	}
+}

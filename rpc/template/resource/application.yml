@@ -1,0 +1,13 @@
+application:
+    name: "fastcar-boot-rpc"
+settings:
+    rpc:
+        list:
+            - {
+                  id: "server-1",
+                  type: "ws",
+                  server: { port: 1235 },
+                  extra: {},
+                  serviceType: "base",
+                  secure: { username: "user", password: "123456" },
+              }
