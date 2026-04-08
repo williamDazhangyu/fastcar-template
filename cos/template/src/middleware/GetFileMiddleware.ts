@@ -12,7 +12,7 @@ export default function GetFileMiddleware(app: FastCarApplication): koa.Middlewa
 	return async (ctx: koa.Context, next: Function) => {
 		let url = ctx.request.path;
 
-		if (ctx.request.method == "GET" && url != "/getFile") {
+		if ((ctx.request.method == "GET" || ctx.request.method == "HEAD") && url != "/getFile") {
 			let cosService = app.getComponentByTarget(CosService) as CosService;
 			let dataPath = cosService.getFilePath();
 
@@ -35,7 +35,7 @@ export default function GetFileMiddleware(app: FastCarApplication): koa.Middlewa
 		//如果存在该文件
 		await next();
 
-		if (ctx.request.method == "GET" && (ctx.status == CODE.NOT_FOUND || ctx.status == CODE.FORBID)) {
+		if ((ctx.request.method == "GET" || ctx.request.method == "HEAD") && (ctx.status == CODE.NOT_FOUND || ctx.status == CODE.FORBID)) {
 			//进行重定向
 			let configData = app.getComponentByTarget<Data>(Data);
 			if (configData) {

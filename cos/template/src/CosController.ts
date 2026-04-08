@@ -1,5 +1,5 @@
 import { Autowired, Controller, Log, Rule, ValidForm, Value } from "@fastcar/core/annotation";
-import { DELETE, GET, POST, PUT } from "@fastcar/koa/annotation";
+import { DELETE, GET, POST, PUT, AddMapping } from "@fastcar/koa/annotation";
 import Result from "./model/Result";
 import { nanoid } from "nanoid";
 import { Context } from "koa";
@@ -97,6 +97,27 @@ export default class CosController {
 		{ filename }: { filename: string },
 		ctx: Context
 	) {
+		return this.handleGetFile(filename, ctx, false);
+	}
+
+	// 添加 HEAD 方法支持
+	@ValidForm
+	headFile(
+		@Rule({
+			filename: { required: true },
+		})
+		{ filename }: { filename: string },
+		ctx: Context
+	) {
+		return this.handleGetFile(filename, ctx, true);
+	}
+
+	// 处理文件请求的核心逻辑
+	handleGetFile(
+		filename: string,
+		ctx: Context,
+		isHead: boolean
+	) {
 		let range = ctx.headers["range"];
 		let positions = {
 			start: 0,
@@ -163,6 +184,13 @@ export default class CosController {
 
 			return false;
 		});
+
+		// HEAD 请求只返回响应头，不返回响应体
+		if (isHead) {
+			ctx.status = 200;
+			ctx.body = "";
+			return;
+		}
 
 		if (!range) {
 			ctx.status = 200;
@@ -668,3 +696,10 @@ export default class CosController {
 		return Result.ok(data.redirect[bucketUrl] || "");
 	}
 }
+
+// 注册 HEAD 路由
+AddMapping(CosController.prototype, {
+	url: "/getFile",
+	method: "headFile",
+	request: ["head" as any],
+});
