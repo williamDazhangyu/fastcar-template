@@ -1,6 +1,6 @@
 {
 	"name": "@fastcar/template-cos",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "对象存储服务模板",
 	"engines": {
 		"node": ">=22"
