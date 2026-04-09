@@ -745,6 +745,42 @@ export default class CosController {
 		this.cosService.writeData(data);
 		return Result.ok();
 	}
+
+	// 删除重定向配置
+	@DELETE()
+	@ValidForm
+	delRedirect(
+		@Rule({
+			bucket: { required: true },
+		})
+		{ bucket, domain }: { bucket: string; domain?: string }
+	) {
+		let data = this.cosService.getData();
+
+		if (!bucket.startsWith("/")) {
+			bucket = `/${bucket}`;
+		}
+
+		// 如果指定了域名，删除域名级别的重定向
+		if (domain) {
+			const domainConfig = data.redirect?.[domain];
+			if (typeof domainConfig === "object" && domainConfig[bucket]) {
+				delete (data.redirect[domain] as { [path: string]: string })[bucket];
+				// 如果该域名下没有配置了，删除整个域名对象
+				if (Object.keys(data.redirect[domain] as object).length === 0) {
+					delete data.redirect[domain];
+				}
+			}
+		} else {
+			// 删除全局路径重定向
+			if (typeof data.redirect?.[bucket] === "string") {
+				delete data.redirect[bucket];
+			}
+		}
+
+		this.cosService.writeData(data);
+		return Result.ok();
+	}
 }
 
 // 注册 HEAD 路由

@@ -492,6 +492,32 @@ let CosController = class CosController {
         this.cosService.writeData(data);
         return Result_1.default.ok();
     }
+    // 删除重定向配置
+    delRedirect({ bucket, domain }) {
+        let data = this.cosService.getData();
+        if (!bucket.startsWith("/")) {
+            bucket = `/${bucket}`;
+        }
+        // 如果指定了域名，删除域名级别的重定向
+        if (domain) {
+            const domainConfig = data.redirect?.[domain];
+            if (typeof domainConfig === "object" && domainConfig[bucket]) {
+                delete data.redirect[domain][bucket];
+                // 如果该域名下没有配置了，删除整个域名对象
+                if (Object.keys(data.redirect[domain]).length === 0) {
+                    delete data.redirect[domain];
+                }
+            }
+        }
+        else {
+            // 删除全局路径重定向
+            if (typeof data.redirect?.[bucket] === "string") {
+                delete data.redirect[bucket];
+            }
+        }
+        this.cosService.writeData(data);
+        return Result_1.default.ok();
+    }
 };
 __decorate([
     annotation_1.Autowired,
@@ -731,6 +757,16 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], CosController.prototype, "saveDomains", null);
+__decorate([
+    (0, annotation_2.DELETE)(),
+    annotation_1.ValidForm,
+    __param(0, (0, annotation_1.Rule)({
+        bucket: { required: true },
+    })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], CosController.prototype, "delRedirect", null);
 CosController = __decorate([
     annotation_1.Controller
 ], CosController);
