@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ZipSuffixs = exports.ZipMap = void 0;
+const core_1 = require("@fastcar/core");
+exports.ZipMap = new core_1.DataMap();
+exports.ZipMap.set(".zip", "zip");
+exports.ZipMap.set(".tar", "tar");
+exports.ZipMap.set(".tar.gz", "tgz");
+exports.ZipMap.set(".gz", "gzip");
+exports.ZipMap.set(".tgz", "tgz");
+exports.ZipSuffixs = exports.ZipMap.toKeys();

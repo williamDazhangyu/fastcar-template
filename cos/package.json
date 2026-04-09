@@ -1,6 +1,6 @@
 {
 	"name": "@fastcar/template-cos",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"description": "基于 fastcar-core 的对象存储服务模板",
 	"main": "index.js",
 	"keywords": [
