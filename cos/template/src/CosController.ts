@@ -723,6 +723,28 @@ export default class CosController {
 
 		return Result.ok(redirectUrl || "");
 	}
+
+	// 获取域名列表
+	@GET()
+	getDomains() {
+		let data = this.cosService.getData();
+		return Result.ok(data.domains || []);
+	}
+
+	// 保存域名列表
+	@POST()
+	@ValidForm
+	saveDomains(
+		@Rule({
+			domains: { required: true, type: "array" },
+		})
+		{ domains }: { domains: string[] }
+	) {
+		let data = this.cosService.getData();
+		data.domains = domains;
+		this.cosService.writeData(data);
+		return Result.ok();
+	}
 }
 
 // 注册 HEAD 路由
