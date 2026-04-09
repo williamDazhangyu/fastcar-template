@@ -623,16 +623,12 @@ export default class CosController {
 			redirectUrl: { required: true },
 			flag: { required: true, type: "boolean" },
 		})
-		{ redirectUrl, flag, bucket }: { redirectUrl: string; flag: boolean; bucket: string }
+		{ redirectUrl, flag, bucket, domain }: { redirectUrl: string; flag: boolean; bucket: string; domain?: string }
 	) {
 		let data = this.cosService.getData();
 
 		if (!redirectUrl.startsWith("/") && !redirectUrl.startsWith("http")) {
 			redirectUrl = `/${redirectUrl}`;
-		}
-
-		if (!bucket.startsWith("/")) {
-			bucket = `/${bucket}`;
 		}
 
 		//全部重定向
@@ -642,7 +638,21 @@ export default class CosController {
 			if (!bucket) {
 				return Result.errorCode(CODE.BAD_REQUEST);
 			}
-			data.redirect[bucket] = redirectUrl;
+
+			if (!bucket.startsWith("/")) {
+				bucket = `/${bucket}`;
+			}
+
+			// 如果指定了域名，设置域名级别的重定向
+			if (domain) {
+				if (!data.redirect[domain]) {
+					data.redirect[domain] = {};
+				}
+				(data.redirect[domain] as { [path: string]: string })[bucket] = redirectUrl;
+			} else {
+				// 全局路径重定向
+				data.redirect[bucket] = redirectUrl;
+			}
 		}
 
 		this.cosService.writeData(data);
@@ -682,7 +692,7 @@ export default class CosController {
 	}
 
 	@GET()
-	queryRedirect({ bucketUrl }: { bucketUrl?: string }) {
+	queryRedirect({ bucketUrl, domain }: { bucketUrl?: string; domain?: string }) {
 		let data = this.cosService.getData();
 
 		if (!bucketUrl) {
@@ -693,7 +703,25 @@ export default class CosController {
 			bucketUrl = `/${bucketUrl}`;
 		}
 
-		return Result.ok(data.redirect[bucketUrl] || "");
+		let redirectUrl: string | undefined;
+
+		// 如果指定了域名，优先查询域名下的配置
+		if (domain) {
+			const domainConfig = data.redirect?.[domain];
+			if (typeof domainConfig === "object") {
+				redirectUrl = domainConfig[bucketUrl];
+			}
+		}
+
+		// 如果没找到，查询全局配置
+		if (!redirectUrl) {
+			const globalConfig = data.redirect?.[bucketUrl];
+			if (typeof globalConfig === "string") {
+				redirectUrl = globalConfig;
+			}
+		}
+
+		return Result.ok(redirectUrl || "");
 	}
 }
 

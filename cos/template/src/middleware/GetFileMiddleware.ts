@@ -40,7 +40,31 @@ export default function GetFileMiddleware(app: FastCarApplication): koa.Middlewa
 			let configData = app.getComponentByTarget<Data>(Data);
 			if (configData) {
 				let b = url.split("/")[1];
-				let redirectUrl = configData?.redirect?.[`/${b}`] || configData.defaultredirect;
+				let pathKey = `/${b}`;
+				const host = ctx.request.host || ctx.request.hostname;
+
+				let redirectUrl: string | undefined;
+
+				// 1. 优先匹配域名下的路径配置
+				if (host && configData?.redirect?.[host]) {
+					const domainConfig = configData.redirect[host];
+					if (typeof domainConfig === "object") {
+						redirectUrl = domainConfig[pathKey];
+					}
+				}
+
+				// 2. 次级匹配：全局相对路径配置
+				if (!redirectUrl) {
+					const globalConfig = configData?.redirect?.[pathKey];
+					if (typeof globalConfig === "string") {
+						redirectUrl = globalConfig;
+					}
+				}
+
+				// 3. 最后使用默认重定向
+				if (!redirectUrl) {
+					redirectUrl = configData.defaultredirect;
+				}
 				if (redirectUrl && url != redirectUrl) {
 					delete ctx?.query?.filename;
 					if (Object.keys(ctx.query).length > 0) {
