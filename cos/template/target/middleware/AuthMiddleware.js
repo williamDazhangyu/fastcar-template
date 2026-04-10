@@ -81,6 +81,9 @@ function Auth(app) {
                                             let files = Reflect.get(ctx.request, "files");
                                             if (!!files) {
                                                 if (Object.keys(files).every((f) => {
+                                                    if (!f.startsWith("/")) {
+                                                        f = `/${f}`;
+                                                    }
                                                     return (0, util_1.includeFile)(f, pobj.dir_path);
                                                 })) {
                                                     return await next();

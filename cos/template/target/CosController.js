@@ -388,7 +388,11 @@ let CosController = class CosController {
     }
     //获取当前的文件的权限 返回权限 是否为继承/指定
     getPermissions({ filename }) {
-        let permission = (0, util_1.matchPermissions)(this.data.permissions, filename);
+        let f = filename;
+        if (!f.startsWith("/")) {
+            f = `/${f}`;
+        }
+        let permission = (0, util_1.matchPermissions)(this.data.permissions, f);
         return Result_1.default.ok({
             filename,
             permission,

@@ -113,11 +113,7 @@ export default class CosController {
 	}
 
 	// 处理文件请求的核心逻辑
-	handleGetFile(
-		filename: string,
-		ctx: Context,
-		isHead: boolean
-	) {
+	handleGetFile(filename: string, ctx: Context, isHead: boolean) {
 		let range = ctx.headers["range"];
 		let positions = {
 			start: 0,
@@ -588,7 +584,12 @@ export default class CosController {
 		})
 		{ filename }: { filename: string }
 	) {
-		let permission = matchPermissions(this.data.permissions, filename);
+		let f = filename;
+		if (!f.startsWith("/")) {
+			f = `/${f}`;
+		}
+
+		let permission = matchPermissions(this.data.permissions, f);
 		return Result.ok({
 			filename,
 			permission,

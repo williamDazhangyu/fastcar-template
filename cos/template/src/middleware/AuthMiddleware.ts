@@ -95,6 +95,9 @@ export default function Auth(app: FastCarApplication): koa.Middleware {
 											if (!!files) {
 												if (
 													Object.keys(files).every((f) => {
+														if (!f.startsWith("/")) {
+															f = `/${f}`;
+														}
 														return includeFile(f, pobj.dir_path as string);
 													})
 												) {
