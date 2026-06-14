@@ -102,6 +102,15 @@ export function includeFile(filename: string, dirname: string): boolean {
 	return minimatch(filename, dirname) || minimatch(filename, `${dirname}/**`); //兼容程序内的设置
 }
 
+export function normalizeCosFilename(filename: string): string {
+	let normalized = filename.trim().replace(/\\/g, "/").replace(/\/+/g, "/");
+	if (!normalized.startsWith("/")) {
+		normalized = `/${normalized}`;
+	}
+
+	return normalized;
+}
+
 export function matchPermissions(permissions: { [key: string]: "public" | "private" }, filename: string) {
 	let macthRes: { key: string; flag: "public" | "private"; len: number } = {
 		key: "",

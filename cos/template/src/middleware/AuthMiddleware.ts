@@ -3,7 +3,7 @@ import * as koa from "koa";
 import Result from "@/model/Result";
 import { CODE } from "@/model/Code";
 import Data from "@/model/Data";
-import { gcmDecrypt, includeFile, matchPermissions } from "@/utils/util";
+import { gcmDecrypt, includeFile, matchPermissions, normalizeCosFilename } from "@/utils/util";
 
 const AuthFileUrls = [
 	"/getFile",
@@ -21,6 +21,8 @@ const AuthFileUrls = [
 	"/setRedirect",
 	"/rename",
 	"/extractFile",
+	"/image/generatePreview",
+	"/image/resize",
 	"/getRedirect",
 	"/queryRedirect",
 ];
@@ -85,7 +87,11 @@ export default function Auth(app: FastCarApplication): koa.Middleware {
 								if (pobj && pobj.appid == appid && Date.now() < pobj.expireTime * 1000) {
 									//进行路径匹配
 									if (pobj.dir_path && pobj.dir_path != "/") {
-										if (AuthFileUrls.includes(url)) {
+										if (url == "/image/generatePreview" || url == "/image/resize") {
+											if (isImageProcessAllowed(body, pobj.dir_path)) {
+												return await next();
+											}
+										} else if (AuthFileUrls.includes(url)) {
 											let { filename } = body;
 											if (filename && typeof filename == "string" && includeFile(filename, pobj.dir_path)) {
 												return await next();
@@ -120,4 +126,25 @@ export default function Auth(app: FastCarApplication): koa.Middleware {
 		ctx.body = Result.errorCode(CODE.FORBID);
 		ctx.status = CODE.FORBID;
 	};
+}
+
+function isImageProcessAllowed(body: { [key: string]: any }, dirPath: string): boolean {
+	const { filename, sourceUrl, targetFilename } = body;
+	const normalizedDirPath = normalizeCosFilename(dirPath);
+	if (!targetFilename || typeof targetFilename != "string") {
+		return false;
+	}
+	if (!!filename == !!sourceUrl) {
+		return false;
+	}
+	const normalizedTargetFilename = normalizeCosFilename(targetFilename);
+	if (filename && typeof filename == "string") {
+		const sourceFilename = normalizeCosFilename(filename);
+		return includeFile(sourceFilename, normalizedDirPath) && includeFile(normalizedTargetFilename, normalizedDirPath);
+	}
+	if (sourceUrl && typeof sourceUrl == "string") {
+		return includeFile(normalizedTargetFilename, normalizedDirPath);
+	}
+
+	return false;
 }

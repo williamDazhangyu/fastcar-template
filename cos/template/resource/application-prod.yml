@@ -18,3 +18,11 @@ settings:
     printConsole: true
     domain: "https://www.example.com" #对外展示的域名
     dir_path: "/www" #数据存放的文件夹
+    preview:
+        maxLongEdge: 1280 # 预览图最长边像素
+        maxOriginalBytes: 512000 # 小图原图直出阈值，默认 500KB
+        localImageMaxBytes: 104857600 # 本地 filename 最大可处理文件大小，默认 100MB
+        externalImageMaxBytes: 26214400 # 外部 URL 最大下载大小，默认 25MB
+        externalImageTimeoutMs: 15000 # 外部 URL 下载超时
+        webpQuality: 82 # WebP 质量，1-100
+        maxDimension: 8192 # resize 或预览最长边最大允许像素，防止异常大图处理占用过高

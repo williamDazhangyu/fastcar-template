@@ -31,6 +31,10 @@ export default class CosController {
 	@Autowired
 	private data!: Data;
 
+	private syncRuntimeData(data: Data) {
+		Object.assign(this.data, data);
+	}
+
 	@GET("/common/getAccountInfo")
 	getAccountInfo() {
 		return Result.ok(this.cosService.createAccount());
@@ -526,6 +530,7 @@ export default class CosController {
 
 		data.accounts.push(info);
 		this.cosService.writeData(data);
+		this.syncRuntimeData(data);
 
 		return Result.ok(info);
 	}
@@ -547,6 +552,7 @@ export default class CosController {
 		if (findIndex > -1) {
 			data.accounts.splice(findIndex, 1);
 			this.cosService.writeData(data);
+			this.syncRuntimeData(data);
 		}
 
 		return Result.ok();
@@ -571,6 +577,7 @@ export default class CosController {
 		data.permissions[filename] = permission;
 
 		this.cosService.writeData(data);
+		this.syncRuntimeData(data);
 
 		return Result.ok();
 	}
@@ -611,6 +618,7 @@ export default class CosController {
 		if (Reflect.has(this.data.permissions, filename)) {
 			Reflect.deleteProperty(data.permissions, filename);
 			this.cosService.writeData(data);
+			this.syncRuntimeData(data);
 		}
 
 		return Result.ok();
@@ -657,6 +665,7 @@ export default class CosController {
 		}
 
 		this.cosService.writeData(data);
+		this.syncRuntimeData(data);
 		return Result.ok();
 	}
 
@@ -674,6 +683,11 @@ export default class CosController {
 		let np = this.cosService.getFilePath(newname);
 
 		if (fs.existsSync(fp)) {
+			if (!fs.existsSync(np)) {
+				let dir = np.split(path.sep);
+				dir.pop();
+				createDirPath(dir.join(path.sep));
+			}
 			fs.renameSync(fp, np);
 		} else {
 			return Result.errorCode(CODE.NOT_FOUND);
@@ -744,6 +758,7 @@ export default class CosController {
 		let data = this.cosService.getData();
 		data.domains = domains;
 		this.cosService.writeData(data);
+		this.syncRuntimeData(data);
 		return Result.ok();
 	}
 
@@ -780,6 +795,7 @@ export default class CosController {
 		}
 
 		this.cosService.writeData(data);
+		this.syncRuntimeData(data);
 		return Result.ok();
 	}
 }

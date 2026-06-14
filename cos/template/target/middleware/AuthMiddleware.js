@@ -21,6 +21,8 @@ const AuthFileUrls = [
     "/setRedirect",
     "/rename",
     "/extractFile",
+    "/image/generatePreview",
+    "/image/resize",
     "/getRedirect",
     "/queryRedirect",
 ];
@@ -71,7 +73,12 @@ function Auth(app) {
                                 if (pobj && pobj.appid == appid && Date.now() < pobj.expireTime * 1000) {
                                     //进行路径匹配
                                     if (pobj.dir_path && pobj.dir_path != "/") {
-                                        if (AuthFileUrls.includes(url)) {
+                                        if (url == "/image/generatePreview" || url == "/image/resize") {
+                                            if (isImageProcessAllowed(body, pobj.dir_path)) {
+                                                return await next();
+                                            }
+                                        }
+                                        else if (AuthFileUrls.includes(url)) {
                                             let { filename } = body;
                                             if (filename && typeof filename == "string" && (0, util_1.includeFile)(filename, pobj.dir_path)) {
                                                 return await next();
@@ -105,4 +112,23 @@ function Auth(app) {
         ctx.body = Result_1.default.errorCode(Code_1.CODE.FORBID);
         ctx.status = Code_1.CODE.FORBID;
     };
+}
+function isImageProcessAllowed(body, dirPath) {
+    const { filename, sourceUrl, targetFilename } = body;
+    const normalizedDirPath = (0, util_1.normalizeCosFilename)(dirPath);
+    if (!targetFilename || typeof targetFilename != "string") {
+        return false;
+    }
+    if (!!filename == !!sourceUrl) {
+        return false;
+    }
+    const normalizedTargetFilename = (0, util_1.normalizeCosFilename)(targetFilename);
+    if (filename && typeof filename == "string") {
+        const sourceFilename = (0, util_1.normalizeCosFilename)(filename);
+        return (0, util_1.includeFile)(sourceFilename, normalizedDirPath) && (0, util_1.includeFile)(normalizedTargetFilename, normalizedDirPath);
+    }
+    if (sourceUrl && typeof sourceUrl == "string") {
+        return (0, util_1.includeFile)(normalizedTargetFilename, normalizedDirPath);
+    }
+    return false;
 }

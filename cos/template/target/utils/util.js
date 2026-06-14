@@ -6,6 +6,7 @@ exports.gcmEncrypt = gcmEncrypt;
 exports.gcmDecrypt = gcmDecrypt;
 exports.fillEnd = fillEnd;
 exports.includeFile = includeFile;
+exports.normalizeCosFilename = normalizeCosFilename;
 exports.matchPermissions = matchPermissions;
 const utils_1 = require("@fastcar/core/utils");
 const fs = require("fs");
@@ -93,6 +94,13 @@ function includeFile(filename, dirname) {
         return true;
     }
     return (0, minimatch_1.minimatch)(filename, dirname) || (0, minimatch_1.minimatch)(filename, `${dirname}/**`); //兼容程序内的设置
+}
+function normalizeCosFilename(filename) {
+    let normalized = filename.trim().replace(/\\/g, "/").replace(/\/+/g, "/");
+    if (!normalized.startsWith("/")) {
+        normalized = `/${normalized}`;
+    }
+    return normalized;
 }
 function matchPermissions(permissions, filename) {
     let macthRes = {

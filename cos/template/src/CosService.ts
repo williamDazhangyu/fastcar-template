@@ -1,11 +1,11 @@
+import { FastCarApplication, Logger } from "@fastcar/core";
 import { Autowired, Log, Service } from "@fastcar/core/annotation";
-import Data from "./model/Data";
-import * as yaml from "yaml";
+import { CryptoUtil, FileUtil } from "@fastcar/core/utils";
+import { nanoid } from "nanoid";
 import * as fs from "fs";
 import * as path from "path";
-import { CryptoUtil, FileUtil } from "@fastcar/core/utils";
-import { FastCarApplication, Logger } from "@fastcar/core";
-import { nanoid } from "nanoid";
+import * as yaml from "yaml";
+import Data from "./model/Data";
 
 @Service
 export default class CosService {

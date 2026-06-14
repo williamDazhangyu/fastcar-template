@@ -9,13 +9,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const core_1 = require("@fastcar/core");
 const annotation_1 = require("@fastcar/core/annotation");
-const yaml = require("yaml");
+const utils_1 = require("@fastcar/core/utils");
+const nanoid_1 = require("nanoid");
 const fs = require("fs");
 const path = require("path");
-const utils_1 = require("@fastcar/core/utils");
-const core_1 = require("@fastcar/core");
-const nanoid_1 = require("nanoid");
+const yaml = require("yaml");
 let CosService = class CosService {
     app;
     logger;

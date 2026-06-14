@@ -43,6 +43,60 @@ npm run build
 yarn build
 ```
 
+## 图片处理能力
+
+图片处理能力独立在 `/image` 路由下，支持对 COS 内已有 `filename` 或外部 `sourceUrl` 处理。`filename` 和 `sourceUrl` 必须二选一，`targetFilename` 必填，服务端不会自动推断输出文件名，也不会覆盖已存在文件。签名鉴权时，本地源文件和目标文件都必须在授权 `dir_path` 内；外部 URL 只校验目标文件在授权路径内。
+
+### 生成预览图
+
+`POST /image/generatePreview`
+
+```json
+{
+	"filename": "/images/demo.png",
+	"targetFilename": "/images/demo-preview.webp"
+}
+```
+
+大图会按最长边等比缩放并输出 WebP。小图也会生成到 `targetFilename`，只是保持原尺寸输出 WebP；GIF 预览会复制原 GIF 到 `targetFilename`。本地 `filename` 与 `targetFilename` 规范化后相同时返回 `BAD_REQUEST`。
+
+### 等比缩放
+
+`POST /image/resize`
+
+```json
+{
+	"sourceUrl": "https://example.com/demo.png",
+	"targetFilename": "/images/demo-640.webp",
+	"width": 640
+}
+```
+
+`width` 和 `height` 至少传一个；两个都传时按目标框 `inside` 等比缩放，不裁剪。目标尺寸大于源图时使用 sharp 的高质量插值放大，并在返回值中标记 `upscaled: true`。resize 输出格式保持源图片格式，写入 `targetFilename`，不覆盖源文件或已有目标文件。
+
+阈值可在 `resource/application*.yml` 的 `settings.preview` 中配置；代码内默认值只用于兜底。本地 `filename` 最大可处理大小默认 `100MB`，外部 URL 最大下载大小默认 `25MB`，最大输出边长默认 `8192px`。请求参数可以临时覆盖配置，优先级为：请求参数 > `settings.preview` 配置 > 代码兜底默认值。可选字段包括 `maxLongEdge`、`maxOriginalBytes`、`localImageMaxBytes`、`externalImageMaxBytes`、`externalImageTimeoutMs`、`webpQuality`、`maxDimension`。
+
+返回示例：
+
+```json
+{
+	"code": 200,
+	"msg": "success",
+	"data": {
+		"sourceUrl": "https://cos.example.com/images/demo.png",
+		"previewUrl": "https://cos.example.com/images/demo-preview.webp",
+		"sourceFilename": "/images/demo.png",
+		"previewFilename": "/images/demo-preview.webp",
+		"sourceWidth": 1600,
+		"sourceHeight": 900,
+		"previewWidth": 1280,
+		"previewHeight": 720,
+		"previewSizeBytes": 102400,
+		"previewMimeType": "image/webp"
+	}
+}
+```
+
 ### 启动服务
 
 ```bash

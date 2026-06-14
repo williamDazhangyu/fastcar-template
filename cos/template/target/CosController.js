@@ -34,6 +34,9 @@ let CosController = class CosController {
     domain;
     logger;
     data;
+    syncRuntimeData(data) {
+        Object.assign(this.data, data);
+    }
     getAccountInfo() {
         return Result_1.default.ok(this.cosService.createAccount());
     }
@@ -361,6 +364,7 @@ let CosController = class CosController {
         let info = this.cosService.createAccount();
         data.accounts.push(info);
         this.cosService.writeData(data);
+        this.syncRuntimeData(data);
         return Result_1.default.ok(info);
     }
     //删除用户
@@ -372,6 +376,7 @@ let CosController = class CosController {
         if (findIndex > -1) {
             data.accounts.splice(findIndex, 1);
             this.cosService.writeData(data);
+            this.syncRuntimeData(data);
         }
         return Result_1.default.ok();
     }
@@ -384,6 +389,7 @@ let CosController = class CosController {
         let data = this.cosService.getData();
         data.permissions[filename] = permission;
         this.cosService.writeData(data);
+        this.syncRuntimeData(data);
         return Result_1.default.ok();
     }
     //获取当前的文件的权限 返回权限 是否为继承/指定
@@ -405,6 +411,7 @@ let CosController = class CosController {
         if (Reflect.has(this.data.permissions, filename)) {
             Reflect.deleteProperty(data.permissions, filename);
             this.cosService.writeData(data);
+            this.syncRuntimeData(data);
         }
         return Result_1.default.ok();
     }
@@ -438,6 +445,7 @@ let CosController = class CosController {
             }
         }
         this.cosService.writeData(data);
+        this.syncRuntimeData(data);
         return Result_1.default.ok();
     }
     rename({ filename, newname }) {
@@ -445,6 +453,11 @@ let CosController = class CosController {
         let fp = this.cosService.getFilePath(filename);
         let np = this.cosService.getFilePath(newname);
         if (fs.existsSync(fp)) {
+            if (!fs.existsSync(np)) {
+                let dir = np.split(path.sep);
+                dir.pop();
+                (0, util_1.createDirPath)(dir.join(path.sep));
+            }
             fs.renameSync(fp, np);
         }
         else {
@@ -494,6 +507,7 @@ let CosController = class CosController {
         let data = this.cosService.getData();
         data.domains = domains;
         this.cosService.writeData(data);
+        this.syncRuntimeData(data);
         return Result_1.default.ok();
     }
     // 删除重定向配置
@@ -520,6 +534,7 @@ let CosController = class CosController {
             }
         }
         this.cosService.writeData(data);
+        this.syncRuntimeData(data);
         return Result_1.default.ok();
     }
 };
