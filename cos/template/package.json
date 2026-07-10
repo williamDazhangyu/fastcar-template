@@ -1,6 +1,6 @@
 {
 	"name": "@fastcar/template-cos",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"description": "对象存储服务模板",
 	"engines": {
 		"node": ">=22"
@@ -11,6 +11,7 @@
 		"delete": "pm2 delete ecosystem.config.yml",
 		"build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
 		"debug": "node -r ts-node/register ./src/app.ts",
+		"test": "mocha -r ts-node/register -r tsconfig-paths/register \"test/**/*.test.js\"",
 		"pkg": "npm run build && node build.js"
 	},
 	"dependencies": {

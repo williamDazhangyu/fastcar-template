@@ -23,6 +23,8 @@ const AuthFileUrls = [
     "/extractFile",
     "/image/generatePreview",
     "/image/resize",
+    "/uploadByUrl",
+    "/uploadByUrl/progress",
     "/getRedirect",
     "/queryRedirect",
 ];
@@ -75,12 +77,20 @@ function Auth(app) {
                                     if (pobj.dir_path && pobj.dir_path != "/") {
                                         if (url == "/image/generatePreview" || url == "/image/resize") {
                                             if (isImageProcessAllowed(body, pobj.dir_path)) {
+                                                ctx.state.authClaims = pobj;
+                                                return await next();
+                                            }
+                                        }
+                                        else if (url == "/uploadByUrl" || url == "/uploadByUrl/progress") {
+                                            if (isRemoteUploadAllowed(body, pobj.dir_path)) {
+                                                ctx.state.authClaims = pobj;
                                                 return await next();
                                             }
                                         }
                                         else if (AuthFileUrls.includes(url)) {
                                             let { filename } = body;
                                             if (filename && typeof filename == "string" && (0, util_1.includeFile)(filename, pobj.dir_path)) {
+                                                ctx.state.authClaims = pobj;
                                                 return await next();
                                             }
                                         }
@@ -93,12 +103,14 @@ function Auth(app) {
                                                     }
                                                     return (0, util_1.includeFile)(f, pobj.dir_path);
                                                 })) {
+                                                    ctx.state.authClaims = pobj;
                                                     return await next();
                                                 }
                                             }
                                         }
                                     }
                                     else {
+                                        ctx.state.authClaims = pobj;
                                         return await next();
                                     }
                                 }
@@ -112,6 +124,13 @@ function Auth(app) {
         ctx.body = Result_1.default.errorCode(Code_1.CODE.FORBID);
         ctx.status = Code_1.CODE.FORBID;
     };
+}
+function isRemoteUploadAllowed(body, dirPath) {
+    const { targetFilename } = body;
+    if (!targetFilename || typeof targetFilename != "string") {
+        return false;
+    }
+    return (0, util_1.includeFile)((0, util_1.normalizeCosFilename)(targetFilename), (0, util_1.normalizeCosFilename)(dirPath));
 }
 function isImageProcessAllowed(body, dirPath) {
     const { filename, sourceUrl, targetFilename } = body;

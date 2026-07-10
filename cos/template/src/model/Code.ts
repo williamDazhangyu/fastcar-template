@@ -1,6 +1,7 @@
 export const CODE = {
 	OK: 200,
 	BAD_REQUEST: 400,
+	CONFLICT: 409,
 	NOT_FOUND: 404, //找不到服务
 	FAIL: 500, //内部错误
 	UNAVAILABLE: 503, //不可用

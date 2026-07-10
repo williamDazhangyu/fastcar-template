@@ -8,3 +8,4 @@ logs/*
 *.tgz
 data/*
 resource/*
+runtime/*

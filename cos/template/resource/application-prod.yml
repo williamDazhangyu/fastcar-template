@@ -18,6 +18,15 @@ settings:
     printConsole: true
     domain: "https://www.example.com" #对外展示的域名
     dir_path: "/www" #数据存放的文件夹
+    remoteUpload:
+        maxBytes: 1073741824
+        chunkSize: 5242880
+        chunkConcurrency: 4
+        fileConcurrency: 2
+        requestTimeoutMs: 600000
+        maxAttempts: 3
+        maxRedirects: 5
+        taskRetentionMs: 86400000
     preview:
         maxLongEdge: 1280 # 预览图最长边像素
         maxOriginalBytes: 512000 # 小图原图直出阈值，默认 500KB

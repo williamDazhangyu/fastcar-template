@@ -1,1 +1,5 @@
-{}
+accounts:
+  - appid: YY5BCDAgnVV1zpwMXA4Q2
+    serectkey: f22f23ba5d5b85b1dadbcfe426a818d9
+permissions: {}
+redirect: {}

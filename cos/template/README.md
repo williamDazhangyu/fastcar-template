@@ -97,6 +97,26 @@ yarn build
 }
 ```
 
+## URL 文件后台下载
+
+`POST /uploadByUrl` 接收远程 HTTP/HTTPS 文件并立即创建后台下载任务：
+
+```json
+{
+	"url": "https://example.com/archive.bin",
+	"targetFilename": "/downloads/archive.bin",
+	"sign": "appid;signature"
+}
+```
+
+小于 `5MiB` 的文件使用单流下载；大于等于 `5MiB` 且远端支持 Range 时，按固定 `5MiB` 分片并行下载，完成后按序合并。单文件最多并行 4 个分片，服务默认同时处理 2 个文件。分片网络失败支持片内断点续传和最多 3 次自动尝试；远端不支持 Range 或无法确定大小时自动降级为单流。
+
+创建成功返回规范化后的 `targetFilename` 和当前任务状态。相同 URL 与目标文件的活动任务会幂等返回；同一目标文件对应不同 URL 的活动任务返回 `409`。只有全部分片合并并校验成功后才覆盖最终文件，失败时保留已有目标文件。
+
+`GET /uploadByUrl/progress?targetFilename=/downloads/archive.bin&sign=...` 按最终文件名查询任务，返回分片数、已完成/活动/失败分片、字节进度、尝试次数、结果 URL 和稳定错误码。状态包括 `probing`、`queued`、`downloading`、`merging`、`completed`、`failed`。
+
+远程下载仅允许标准端口的公网 HTTP/HTTPS 地址，逐次请求和重定向都会重新校验 DNS，默认最多 5 次重定向、单请求 10 分钟、文件最大 `1GiB`。任务仅保存在当前进程内，不支持服务重启恢复；完成或失败记录默认保留 24 小时。
+
 ### 启动服务
 
 ```bash

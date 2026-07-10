@@ -3,6 +3,7 @@ import * as koa from "koa";
 import Result from "@/model/Result";
 import { CODE } from "@/model/Code";
 import Data from "@/model/Data";
+import { RemoteUploadAuthClaims } from "@/model/RemoteUpload";
 import { gcmDecrypt, includeFile, matchPermissions, normalizeCosFilename } from "@/utils/util";
 
 const AuthFileUrls = [
@@ -23,6 +24,8 @@ const AuthFileUrls = [
 	"/extractFile",
 	"/image/generatePreview",
 	"/image/resize",
+	"/uploadByUrl",
+	"/uploadByUrl/progress",
 	"/getRedirect",
 	"/queryRedirect",
 ];
@@ -78,22 +81,24 @@ export default function Auth(app: FastCarApplication): koa.Middleware {
 						if (item.appid == appid) {
 							let parseInfo = gcmDecrypt(item.serectkey, sign);
 							if (parseInfo) {
-								let pobj: {
-									expireTime: number; //时间戳精确到秒
-									dir_path?: string; //授权的可访问路径
-									appid: string; //账号id
-									mode: number; // 1可读 2可写 4可查 相互独立
-								} = JSON.parse(parseInfo);
+								let pobj: RemoteUploadAuthClaims = JSON.parse(parseInfo);
 								if (pobj && pobj.appid == appid && Date.now() < pobj.expireTime * 1000) {
 									//进行路径匹配
 									if (pobj.dir_path && pobj.dir_path != "/") {
 										if (url == "/image/generatePreview" || url == "/image/resize") {
 											if (isImageProcessAllowed(body, pobj.dir_path)) {
+												ctx.state.authClaims = pobj;
+												return await next();
+											}
+										} else if (url == "/uploadByUrl" || url == "/uploadByUrl/progress") {
+											if (isRemoteUploadAllowed(body, pobj.dir_path)) {
+												ctx.state.authClaims = pobj;
 												return await next();
 											}
 										} else if (AuthFileUrls.includes(url)) {
 											let { filename } = body;
 											if (filename && typeof filename == "string" && includeFile(filename, pobj.dir_path)) {
+												ctx.state.authClaims = pobj;
 												return await next();
 											}
 										} else if (url == "/uploadfile") {
@@ -107,11 +112,13 @@ export default function Auth(app: FastCarApplication): koa.Middleware {
 														return includeFile(f, pobj.dir_path as string);
 													})
 												) {
+													ctx.state.authClaims = pobj;
 													return await next();
 												}
 											}
 										}
 									} else {
+										ctx.state.authClaims = pobj;
 										return await next();
 									}
 								}
@@ -126,6 +133,14 @@ export default function Auth(app: FastCarApplication): koa.Middleware {
 		ctx.body = Result.errorCode(CODE.FORBID);
 		ctx.status = CODE.FORBID;
 	};
+}
+
+function isRemoteUploadAllowed(body: { [key: string]: any }, dirPath: string): boolean {
+	const { targetFilename } = body;
+	if (!targetFilename || typeof targetFilename != "string") {
+		return false;
+	}
+	return includeFile(normalizeCosFilename(targetFilename), normalizeCosFilename(dirPath));
 }
 
 function isImageProcessAllowed(body: { [key: string]: any }, dirPath: string): boolean {
